@@ -1,6 +1,7 @@
 import React from 'react';
 import socketIOClient from "socket.io-client";
 import Clock from './clocks/clock';
+import BtcUsd from './BTCUSD';
 
 class TradingViewPage extends React.Component {
   constructor() {
@@ -40,15 +41,24 @@ class TradingViewPage extends React.Component {
       , 'LOW24HOUR'       : 0x20000   // hex for binary 100000000000000000
       , 'LASTMARKET'      : 0x40000   // hex for binary 1000000000000000000, this is a special case and will only appear on CCCAGG messages
     };
-    let bitfinexBTCUSD = ['2~Bitfinex~BTC~USD'];
-    let bittrexBTCUSD = ['2~BitTrex~BTC~USD'];
-    let coinbaseBTCUSD = ['2~Coinbase~BTC~USD'];
-    let poloniexBTCUSD = ['2~Poloniex~BTC~USD'];
+    let cryptoCompareBTCUSD = [
+      '2~Bitfinex~BTC~USD',
+      '2~BitTrex~BTC~USD',
+      '5~CCCAGG~BTC~USD',
+      '2~Coinbase~BTC~USD',
+      '2~Poloniex~BTC~USD'
+    ];
     let bitfinexChange24H = "";
     let bittrexChange24H = "";
+    let cccaggChange24H = "";
     let coinbaseChange24H = "";
     let poloniexChange24H = "";
     const { endpoint } = this.state;
+    let bitfinexLastPrice = "";
+    let bittrexLastPrice = "";
+    let cccaggLastPrice = "";
+    let coinbaseLastPrice = "";
+    let poloniexLastPrice = "";
     const socket = socketIOClient(endpoint);
     // socket.on("DarkSkyAPI", data => this.setState({ weather: data }));
     // socket.on("BittrexAPI", data => this.setState({ btcltc_price: data }));
@@ -63,12 +73,8 @@ class TradingViewPage extends React.Component {
     // socket.on("NewsAPI", data => this.setState({ latestNewsArticle: data }));
 
 
-    // Direct API connection
-    // socket.on('2~Coinbase~BTC~USD', data => this.setState({ weather: data }));
-    socket.emit('SubAdd', { subs: bitfinexBTCUSD });
-    socket.emit('SubAdd', { subs: bittrexBTCUSD });
-    socket.emit('SubAdd', { subs: coinbaseBTCUSD });
-    socket.emit('SubAdd', { subs: poloniexBTCUSD });
+    // Direct API Socket-connection
+    socket.emit('SubAdd', { subs: cryptoCompareBTCUSD });
     socket.on("m", data => {
       let valuesArray = data.split("~");
       let valuesArrayLength = valuesArray.length;
@@ -93,25 +99,41 @@ class TradingViewPage extends React.Component {
           currentField++;
         }
       }
-      console.log(btcusd);
       if (btcusd.OPEN24HOUR) {
         btcusd.CHANGE24HOURPCT = ((btcusd.PRICE - btcusd.OPEN24HOUR) / btcusd.OPEN24HOUR * 100).toFixed(2) + "%";
         if (btcusd.MARKET === 'Bitfinex') { bitfinexChange24H = btcusd.CHANGE24HOURPCT; }
         if (btcusd.MARKET === 'BitTrex') { bittrexChange24H = btcusd.CHANGE24HOURPCT; }
+        if (btcusd.MARKET === 'CCCAGG') { cccaggChange24H = btcusd.CHANGE24HOURPCT; }
         if (btcusd.MARKET === 'Coinbase') { coinbaseChange24H = btcusd.CHANGE24HOURPCT; }
         if (btcusd.MARKET === 'Poloniex') { poloniexChange24H = btcusd.CHANGE24HOURPCT; }
       } else {
         if (btcusd.MARKET === 'Bitfinex') { btcusd.CHANGE24HOURPCT = bitfinexChange24H; }
-        if (btcusd.MARKET === 'BitTrex') { btcusd.CHANGE24HOURPCT = bittrexChange24H;  }
+        if (btcusd.MARKET === 'BitTrex') { btcusd.CHANGE24HOURPCT = bittrexChange24H; }
+        if (btcusd.MARKET === 'CCCAGG') { btcusd.CHANGE24HOURPCT = cccaggChange24H; }
         if (btcusd.MARKET === 'Coinbase') { btcusd.CHANGE24HOURPCT = coinbaseChange24H; }
         if (btcusd.MARKET === 'Poloniex') { btcusd.CHANGE24HOURPCT = poloniexChange24H; }
       }
       btcusd.VOLUME24HOURTO = ((btcusd.VOLUME24HOURTO / 1000000).toFixed(2));
-      btcusd.PRICE = Math.round(btcusd.PRICE * 100) / 100
+      if (btcusd.PRICE) {
+        btcusd.PRICE = Math.round(btcusd.PRICE * 100) / 100;
+        if (btcusd.MARKET === 'Bitfinex') { btcusd.PRICE > bitfinexLastPrice ? btcusd.UP = true : btcusd.UP = false; bitfinexLastPrice = btcusd.PRICE; }
+        if (btcusd.MARKET === 'BitTrex') { btcusd.PRICE > bittrexLastPrice ? btcusd.UP = true : btcusd.UP = false; bittrexLastPrice = btcusd.PRICE; }
+        if (btcusd.MARKET === 'CCCAGG') { btcusd.PRICE > cccaggLastPrice ? btcusd.UP = true : btcusd.UP = false; cccaggLastPrice = btcusd.PRICE; }
+        if (btcusd.MARKET === 'Coinbase') { btcusd.PRICE > coinbaseLastPrice ? btcusd.UP = true : btcusd.UP = false; coinbaseLastPrice = btcusd.PRICE; }
+        if (btcusd.MARKET === 'Poloniex') { btcusd.PRICE > poloniexLastPrice ? btcusd.UP = true : btcusd.UP = false; poloniexLastPrice = btcusd.PRICE; }
+      } else {
+        if (btcusd.MARKET === 'Bitfinex') { btcusd.PRICE = bitfinexLastPrice; }
+        if (btcusd.MARKET === 'BitTrex') { btcusd.PRICE = bittrexLastPrice; }
+        if (btcusd.MARKET === 'CCCAGG') { btcusd.PRICE = cccaggLastPrice; }
+        if (btcusd.MARKET === 'Coinbase') { btcusd.PRICE = coinbaseLastPrice; }
+        if (btcusd.MARKET === 'Poloniex') { btcusd.PRICE = poloniexLastPrice; }
+      }
       if (btcusd.MARKET === 'Bitfinex') { this.setState({ btcusdBitfinex: btcusd }); }
       if (btcusd.MARKET === 'BitTrex') { this.setState({ btcusdBittrex: btcusd }); }
+      if (btcusd.MARKET === 'CCCAGG') { this.setState({ btcusdCCCAGG: btcusd }); }
       if (btcusd.MARKET === 'Coinbase') { this.setState({ btcusdCoinbase: btcusd }); }
       if (btcusd.MARKET === 'Poloniex') { this.setState({ btcusdPoloniex: btcusd }); }
+      console.log(btcusd);
     });
   }
 
@@ -126,6 +148,7 @@ class TradingViewPage extends React.Component {
       btcusdPoloniex,
       btcusdBitfinex,
       btcusdBittrex,
+      btcusdCCCAGG,
       btcusdCoinbase,
       bloombergArticles,
       businessInsiderArticles,
@@ -145,8 +168,12 @@ class TradingViewPage extends React.Component {
     let MarketBTCUSDTitle = {
       fontWeight: "800"
     }
-    let MarketBTCUSDPrice = {
-      color: "#DAA520",
+    let MarketBTCUSDPriceUp = {
+      color: "#32CD32",
+      fontSize: "150%"
+    }
+    let MarketBTCUSDPriceDown = {
+      color: "#DC143C",
       fontSize: "150%"
     }
     let newsArticle = {
@@ -216,36 +243,44 @@ class TradingViewPage extends React.Component {
 
     return (
       <div style={{marginTop: "5px"}} className="row">
-        {btcusdPoloniex ?
-          <div className="col-xs-3" style={MarketBTCUSD}>
-            <span style={MarketBTCUSDTitle}>Binance</span><br />
-            <span style={MarketBTCUSDPrice}>${btcusdPoloniex.PRICE}</span><br />
-            <span>{btcusdTitles.change}{btcusdPoloniex.CHANGE24HOURPCT}</span><br />
-            <span>{btcusdTitles.volume}${btcusdPoloniex.VOLUME24HOURTO}M</span>
+        {btcusdCCCAGG ?
+          <div className="col-xs-2" style={MarketBTCUSD}>
+            <span style={MarketBTCUSDTitle}>Market Average</span><br />
+            <span style={btcusdCCCAGG.UP ? MarketBTCUSDPriceUp : MarketBTCUSDPriceDown}>${btcusdCCCAGG.PRICE}</span><br />
+            <span>{btcusdTitles.change}{btcusdCCCAGG.CHANGE24HOURPCT}</span><br />
+            <span>{btcusdTitles.volume}${btcusdCCCAGG.VOLUME24HOURTO}M</span>
           </div> : ''
         }
         {btcusdBitfinex ?
-          <div className="col-xs-3" style={MarketBTCUSD}>
-            <span style={MarketBTCUSDTitle}>Poloniex</span><br />
-            <span style={MarketBTCUSDPrice}>${btcusdBitfinex.PRICE}</span><br />
+          <div className="col-xs-2" style={MarketBTCUSD}>
+            <span style={MarketBTCUSDTitle}>Bitfinex</span><br />
+            <span style={btcusdBitfinex.UP ? MarketBTCUSDPriceUp : MarketBTCUSDPriceDown}>${btcusdBitfinex.PRICE}</span><br />
             <span>{btcusdTitles.change}{btcusdBitfinex.CHANGE24HOURPCT}</span><br />
             <span>{btcusdTitles.volume}${btcusdBitfinex.VOLUME24HOURTO}M</span>
           </div> : ''
         }
         {btcusdBittrex ?
-          <div className="col-xs-3" style={MarketBTCUSD}>
+          <div className="col-xs-2" style={MarketBTCUSD}>
             <span style={MarketBTCUSDTitle}>Bittrex</span><br />
-            <span style={MarketBTCUSDPrice}>${btcusdBittrex.PRICE}</span><br />
+            <span style={btcusdBittrex.UP ? MarketBTCUSDPriceUp : MarketBTCUSDPriceDown}>${btcusdBittrex.PRICE}</span><br />
             <span>{btcusdTitles.change} {btcusdBittrex.CHANGE24HOURPCT}</span><br />
             <span>{btcusdTitles.volume}${btcusdBittrex.VOLUME24HOURTO}M</span>
           </div> : ''
         }
         {btcusdCoinbase ?
-          <div className="col-xs-3" style={MarketBTCUSD}>
+          <div className="col-xs-2" style={MarketBTCUSD}>
             <span style={MarketBTCUSDTitle}>Coinbase</span><br />
-            <span style={MarketBTCUSDPrice}>${btcusdCoinbase.PRICE}</span><br />
+            <span style={btcusdCoinbase.UP ? MarketBTCUSDPriceUp : MarketBTCUSDPriceDown}>${btcusdCoinbase.PRICE}</span><br />
             <span>{btcusdTitles.change} {btcusdCoinbase.CHANGE24HOURPCT}</span><br />
             <span>{btcusdTitles.volume}${btcusdCoinbase.VOLUME24HOURTO}M</span>
+          </div> : ''
+        }
+        {btcusdPoloniex ?
+          <div className="col-xs-2" style={MarketBTCUSD}>
+            <span style={MarketBTCUSDTitle}>Poloniex</span><br />
+            <span style={btcusdPoloniex.UP ? MarketBTCUSDPriceUp : MarketBTCUSDPriceDown}>${btcusdPoloniex.PRICE}</span><br />
+            <span>{btcusdTitles.change}{btcusdPoloniex.CHANGE24HOURPCT}</span><br />
+            <span>{btcusdTitles.volume}${btcusdPoloniex.VOLUME24HOURTO}M</span>
           </div> : ''
         }
       </div>
