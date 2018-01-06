@@ -21,23 +21,22 @@ export default class Clock extends React.Component {
     this.setState({
       date: new Date()
     });
+    this.ISOStringDateCET = this.state.date.addHours(1).toISOString();
+    this.ISOStringDatePST = this.state.date.addHours(-9).toISOString();
+    this.ISOStringDateKST = this.state.date.addHours(-7).toISOString();
   }
 
   render() {
     const clock = {
-      margin: "5px",
-      padding: "15px",
-      borderRadius: "5px",
+      border: "2px white solid",
+      padding: "10px",
       backgroundColor: "#343434"
-    }
-    const ISOStringDateCET = this.state.date.addHours(1).toISOString();
-    const ISOStringDatePST = this.state.date.addHours(-9).toISOString();
-    const ISOStringDateKST = this.state.date.addHours(-7).toISOString();
+    };
     return (
         <div>
-            <span style={clock}>CET: {ISOStringDateCET.substring(0, 19).replace('T', ' ').substring(11, 19)}</span>
-            <span style={clock}>PST: {ISOStringDatePST.substring(0, 19).replace('T', ' ').substring(11, 19)}</span>
-            <span style={clock}>KST: {ISOStringDateKST.substring(0, 19).replace('T', ' ').substring(11, 19)}</span>
+            <span style={clock}>CET | {this.ISOStringDateCET ? this.ISOStringDateCET.substring(0, 19).replace('T', ' ').substring(11, 19) : ''}</span>
+            <span style={clock}>PST | {this.ISOStringDatePST ? this.ISOStringDatePST.substring(0, 19).replace('T', ' ').substring(11, 19) : ''}</span>
+            <span style={clock}>KST | {this.ISOStringDateKST ? this.ISOStringDateKST.substring(0, 19).replace('T', ' ').substring(11, 19) : ''}</span>
         </div>
     );
   }
@@ -46,4 +45,4 @@ export default class Clock extends React.Component {
 Date.prototype.addHours = function(h) {
   this.setTime(this.getTime() + (h*60*60*1000));
   return this;
-}
+};
