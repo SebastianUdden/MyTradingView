@@ -28,15 +28,19 @@ export default class Clock extends React.Component {
 
   render() {
     const clock = {
-      border: "2px white solid",
+      textAlign: "center",
+      border: "1px white solid",
       padding: "10px",
-      backgroundColor: "#343434"
+      fontWeight: "600",
+      fontSize: "140%",
+      color: "#ddd",
+      backgroundColor: "#000"
     };
     return (
         <div>
-            <span style={clock}>CET | {this.ISOStringDateCET ? this.ISOStringDateCET.substring(0, 19).replace('T', ' ').substring(11, 19) : ''}</span>
-            <span style={clock}>PST | {this.ISOStringDatePST ? this.ISOStringDatePST.substring(0, 19).replace('T', ' ').substring(11, 19) : ''}</span>
-            <span style={clock}>KST | {this.ISOStringDateKST ? this.ISOStringDateKST.substring(0, 19).replace('T', ' ').substring(11, 19) : ''}</span>
+            <span className="col-xs-3" style={clock}>CET | {this.ISOStringDateCET ? this.ISOStringDateCET.substring(0, 19).replace('T', ' ').substring(11, 19) : ''}</span>
+            <span className="col-xs-4" style={clock}>PST | {this.ISOStringDatePST ? this.ISOStringDatePST.substring(0, 19).replace('T', ' ').substring(11, 19) : ''}</span>
+            <span className="col-xs-3" style={clock}>KST | {this.ISOStringDateKST ? this.ISOStringDateKST.substring(0, 19).replace('T', ' ').substring(11, 19) : ''}</span>
         </div>
     );
   }
