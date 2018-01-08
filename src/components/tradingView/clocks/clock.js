@@ -38,9 +38,9 @@ export default class Clock extends React.Component {
     };
     return (
         <div>
-            <span className="col-xs-3" style={clock}>CET | {this.ISOStringDateCET ? this.ISOStringDateCET.substring(0, 19).replace('T', ' ').substring(11, 19) : ''}</span>
-            <span className="col-xs-4" style={clock}>PST | {this.ISOStringDatePST ? this.ISOStringDatePST.substring(0, 19).replace('T', ' ').substring(11, 19) : ''}</span>
-            <span className="col-xs-3" style={clock}>KST | {this.ISOStringDateKST ? this.ISOStringDateKST.substring(0, 19).replace('T', ' ').substring(11, 19) : ''}</span>
+            <span className="col-xs-4" style={clock}>Central European Time | {this.ISOStringDateCET ? this.ISOStringDateCET.substring(0, 19).replace('T', ' ').substring(11, 19) : ''}</span>
+            <span className="col-xs-4" style={clock}>Pacific Standard Time | {this.ISOStringDatePST ? this.ISOStringDatePST.substring(0, 19).replace('T', ' ').substring(11, 19) : ''}</span>
+            <span className="col-xs-4" style={clock}>Korean Standard Time | {this.ISOStringDateKST ? this.ISOStringDateKST.substring(0, 19).replace('T', ' ').substring(11, 19) : ''}</span>
         </div>
     );
   }
