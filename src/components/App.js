@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { Switch, NavLink, Route } from 'react-router-dom';
 import HomePage from './home/HomePage';
 import AboutPage from './about/AboutPage';
+import LearningPage from './learning/LearningPage';
 import TradingViewPage from './tradingView/TradingViewPage';
 import APIPage from './api/APIPage';
 import NotFoundPage from './NotFoundPage';
@@ -24,6 +25,8 @@ class App extends React.Component {
           {' | '}
           <NavLink to="/trading-view" activeStyle={choosenStyle}>Trading View</NavLink>
           {' | '}
+          <NavLink to="/learning" activeStyle={choosenStyle}>Learning</NavLink>
+          {' | '}
           <NavLink to="/api" activeStyle={choosenStyle}>API</NavLink>
           {' | '}
           <a href="https://trello.com/b/qMkwFOg9/tradingview" target="_blank" activeStyle={choosenStyle}>Trello</a>
@@ -32,6 +35,7 @@ class App extends React.Component {
           <Route exact path="/" component={HomePage} />
           <Route path="/about" component={AboutPage} />
           <Route path="/trading-view" component={TradingViewPage} />
+          <Route path="/learning" component={LearningPage} />
           <Route path="/api" component={APIPage} />
           <Route component={NotFoundPage} />
         </Switch>
