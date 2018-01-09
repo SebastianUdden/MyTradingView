@@ -10,6 +10,8 @@ class TradingViewPage extends React.Component {
     super();
     this.state = {
       showNews: true,
+      showBloomberg: false,
+      showBusinessInsider: false,
       showAltCoins: true,
       response: false,
       localEndpoint: "http://127.0.0.1:4001",
@@ -286,9 +288,9 @@ class TradingViewPage extends React.Component {
     // socket.on("CryptoWatchAPI", data => this.setState({ usdbtc_price: data }));
     // socket.on("BitfinexAPI", data => this.setState({ usdbtc_last_price: data }));
     localSocket.on("BloombergArticles", data => this.setState({ bloombergArticles: data }));
-    // socket.on("BusinessInsiderArticles", data => this.setState({ businessInsiderArticles: data }));
-    // socket.on("CnnArticles", data => this.setState({ cnnArticles: data }));
-    // socket.on("CnbcArticles", data => this.setState({ cnbcArticles: data }));
+    localSocket.on("BusinessInsiderArticles", data => this.setState({ businessInsiderArticles: data }));
+    localSocket.on("CnnArticles", data => this.setState({ cnnArticles: data }));
+    localSocket.on("CnbcArticles", data => this.setState({ cnbcArticles: data }));
 
     // Direct API Socket-connection
     socket.emit('SubAdd', { subs: cryptoCompare });
@@ -371,6 +373,8 @@ class TradingViewPage extends React.Component {
   }
 
   ToggleNews = () => { this.setState({ showNews: !this.state.showNews }); };
+  ToggleBloomberg = () => { this.setState({ showBloomberg: !this.state.showBloomberg }); };
+  ToggleBusinessInsider = () => { this.setState({ showBusinessInsider: !this.state.showBusinessInsider }); };
   ToggleAltCoins = () => { this.setState({ showAltCoins: !this.state.showAltCoins }); };
 
   render() {
@@ -385,10 +389,10 @@ class TradingViewPage extends React.Component {
       bittrex,
 
       // News Articles
-      // bloombergArticles,
-      // businessInsiderArticles,
-      // cnnArticles,
-      // cnbcArticles,
+      bloombergArticles,
+      businessInsiderArticles,
+      cnnArticles,
+      cnbcArticles,
     } = this.state;
     let topToggle = {
       backgroundColor: "#000",
@@ -396,8 +400,14 @@ class TradingViewPage extends React.Component {
       border: "1px white solid",
       padding: "3px"
     };
-
-          // {this.state.showNews && bloombergArticles ? <Articles articles={bloombergArticles} /> : '' }
+    let topToggleTab = {
+      backgroundColor: "#000",
+      color: "#ccc",
+      border: "1px white solid",
+      padding: "3px",
+      width: "25%",
+      marginLeft: "0"
+    };
     return (
       <div>
         <div style={{marginTop: "15px", marginBottom: "0px"}} className="row">
@@ -413,6 +423,10 @@ class TradingViewPage extends React.Component {
             <button onClick={this.ToggleNews} className="col-xs-2" style={topToggle}>Hide News</button> :
             <button onClick={this.ToggleNews} className="col-xs-2" style={topToggle}>Show News</button>
           }
+          <div className="col-xs-2">
+            {this.state.showNews ? <button onClick={this.ToggleBloomberg} style={topToggleTab}>1</button> : ''}
+            {this.state.showNews ? <button onClick={this.ToggleBusinessInsider} style={topToggleTab}>2</button> : ''}
+          </div>
           {this.state.showAltCoins ?
             <button onClick={this.ToggleAltCoins} className="col-xs-2" style={topToggle}>Hide AltCoins</button> :
             <button onClick={this.ToggleAltCoins} className="col-xs-2" style={topToggle}>Show AltCoins</button>
@@ -420,6 +434,10 @@ class TradingViewPage extends React.Component {
         </div>
         <div>
           {this.state.showNews ? <h2>News</h2> : ''}
+          {this.state.showNews && this.state.showBloomberg ? <h4>Bloomberg</h4> : ''}
+          {this.state.showNews && this.state.showBloomberg && bloombergArticles ? <Articles articles={bloombergArticles} /> : '' }
+          {this.state.showBusinessInsider ? <h4>Business Insider</h4> : ''}
+          {this.state.showNews && this.state.showBusinessInsider && businessInsiderArticles ? <Articles articles={businessInsiderArticles} /> : '' }
         </div>
         <div style={{marginTop: "15px", marginBottom: "0px"}} className="row">
           <div>
