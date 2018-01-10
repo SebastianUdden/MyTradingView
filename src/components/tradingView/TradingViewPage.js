@@ -2,17 +2,19 @@ import React from 'react';
 import socketIOClient from "socket.io-client";
 import Clock from './clocks/clock';
 import BtcUsd from './BTCUSD';
-import Ccy from './Currency';
 import Articles from './Articles';
-
+import TableContent from './currencyTable/TableContent';
 class TradingViewPage extends React.Component {
   constructor() {
     super();
     this.state = {
-      showNews: true,
-      showBloomberg: false,
+      showNews: false,
+      showBloomberg: true,
       showBusinessInsider: false,
+      showCNN: false,
+      showCNBC: false,
       showAltCoins: true,
+      showFilteredAltCoins: true,
       response: false,
       localEndpoint: "http://127.0.0.1:4001",
       endpoint: "https://streamer.cryptocompare.com/"
@@ -373,9 +375,12 @@ class TradingViewPage extends React.Component {
   }
 
   ToggleNews = () => { this.setState({ showNews: !this.state.showNews }); };
-  ToggleBloomberg = () => { this.setState({ showBloomberg: !this.state.showBloomberg }); };
-  ToggleBusinessInsider = () => { this.setState({ showBusinessInsider: !this.state.showBusinessInsider }); };
+  ToggleBloomberg = () => { this.setState({ showBloomberg: true, showBusinessInsider: false, showCNN: false, showCNBC: false }); };
+  ToggleBusinessInsider = () => { this.setState({ showBloomberg: false, showBusinessInsider: true, showCNN: false, showCNBC: false }); };
+  ToggleCNN = () => { this.setState({ showBloomberg: false, showBusinessInsider: false, showCNN: true, showCNBC: false }); };
+  ToggleCNBC = () => { this.setState({ showBloomberg: false, showBusinessInsider: false, showCNN: false, showCNBC: true }); };
   ToggleAltCoins = () => { this.setState({ showAltCoins: !this.state.showAltCoins }); };
+  ToggleFilteredAltCoins = () => { this.setState({ showFilteredAltCoins: !this.state.showFilteredAltCoins }); };
 
   render() {
     const {
@@ -394,20 +399,35 @@ class TradingViewPage extends React.Component {
       cnnArticles,
       cnbcArticles,
     } = this.state;
-    let topToggle = {
-      backgroundColor: "#000",
-      color: "#ccc",
-      border: "1px white solid",
-      padding: "3px"
-    };
-    let topToggleTab = {
-      backgroundColor: "#000",
-      color: "#ccc",
-      border: "1px white solid",
-      padding: "3px",
-      width: "25%",
-      marginLeft: "0"
-    };
+
+    let styles = {
+      toggleButton: {
+        main: {
+          color: "#ccc",
+          border: "1px white solid",
+          padding: "3px"
+        },
+        show: {
+          backgroundColor: "#000"
+        },
+        hide: {
+          backgroundColor: "#444"
+        }
+      },
+      tab : {
+        first: {
+          width: "25%",
+          marginLeft: "-10%"
+        },
+        middle: {
+          width: "30%",
+        },
+        last: {
+          width: "35%",
+          marginRight: "-10%"
+        }
+      }
+    }
     return (
       <div>
         <div style={{marginTop: "15px", marginBottom: "0px"}} className="row">
@@ -416,242 +436,47 @@ class TradingViewPage extends React.Component {
         <div style={{marginTop: "0px"}} className="row">
           {btcusdCCCAGG ? <BtcUsd btcusd={btcusdCCCAGG} /> : ''}
           {btcusdBitfinex ? <BtcUsd btcusd={btcusdBitfinex} /> : ''}
-          {bittrex['BTC'] ? <BtcUsd btcusd={bittrex['BTC']} /> : ''}
+          {bittrex && bittrex['BTC'] ? <BtcUsd btcusd={bittrex['BTC']} /> : ''}
           {btcusdCoinbase ? <BtcUsd btcusd={btcusdCoinbase} /> : ''}
           {btcusdPoloniex ? <BtcUsd btcusd={btcusdPoloniex} /> : ''}
           {this.state.showNews ?
-            <button onClick={this.ToggleNews} className="col-xs-2" style={topToggle}>Hide News</button> :
-            <button onClick={this.ToggleNews} className="col-xs-2" style={topToggle}>Show News</button>
+            <button onClick={this.ToggleNews} className="col-xs-2" style={{...styles.toggleButton.main,...styles.toggleButton.hide}}>Hide News</button> :
+            <button onClick={this.ToggleNews} className="col-xs-2" style={{...styles.toggleButton.main,...styles.toggleButton.show}}>Show News</button>
           }
           <div className="col-xs-2">
-            {this.state.showNews ? <button onClick={this.ToggleBloomberg} style={topToggleTab}>1</button> : ''}
-            {this.state.showNews ? <button onClick={this.ToggleBusinessInsider} style={topToggleTab}>2</button> : ''}
+            {this.state.showNews && !this.state.showBloomberg? <button onClick={this.ToggleBloomberg} style={{...styles.toggleButton.main,...styles.toggleButton.show,...styles.tab.first}}>BL</button> : ''}
+            {this.state.showNews && this.state.showBloomberg ? <button style={{...styles.toggleButton.main,...styles.toggleButton.hide,...styles.tab.first}}>BL</button> : ''}
+            {this.state.showNews && !this.state.showBusinessInsider? <button onClick={this.ToggleBusinessInsider} style={{...styles.toggleButton.main,...styles.toggleButton.show,...styles.tab.middle}}>BI</button> : ''}
+            {this.state.showNews && this.state.showBusinessInsider ? <button style={{...styles.toggleButton.main,...styles.toggleButton.hide,...styles.tab.middle}}>BI</button> : ''}
+            {this.state.showNews && !this.state.showCNN? <button onClick={this.ToggleCNN} style={{...styles.toggleButton.main,...styles.toggleButton.show,...styles.tab.middle}}>CNN</button> : ''}
+            {this.state.showNews && this.state.showCNN ? <button style={{...styles.toggleButton.main,...styles.toggleButton.hide,...styles.tab.middle}}>CNN</button> : ''}
+            {this.state.showNews && !this.state.showCNBC ? <button onClick={this.ToggleCNBC} style={{...styles.toggleButton.main,...styles.toggleButton.show,...styles.tab.last}}>CNBC</button> : ''}
+            {this.state.showNews && this.state.showCNBC ? <button style={{...styles.toggleButton.main,...styles.toggleButton.hide,...styles.tab.last}}>CNBC</button> : ''}
           </div>
           {this.state.showAltCoins ?
-            <button onClick={this.ToggleAltCoins} className="col-xs-2" style={topToggle}>Hide AltCoins</button> :
-            <button onClick={this.ToggleAltCoins} className="col-xs-2" style={topToggle}>Show AltCoins</button>
+            <button onClick={this.ToggleAltCoins} className="col-xs-2" style={{...styles.toggleButton.main,...styles.toggleButton.hide}}>Hide AltCoins</button> :
+            <button onClick={this.ToggleAltCoins} className="col-xs-2" style={{...styles.toggleButton.main,...styles.toggleButton.show}}>Show AltCoins</button>
+          }
+          {this.state.showFilteredAltCoins ?
+            <button onClick={this.ToggleFilteredAltCoins} className="col-xs-2" style={{...styles.toggleButton.main,...styles.toggleButton.hide}}>Hide Filtered AC</button> :
+            <button onClick={this.ToggleFilteredAltCoins} className="col-xs-2" style={{...styles.toggleButton.main,...styles.toggleButton.show}}>Show Filtered AC</button>
           }
         </div>
         <div>
           {this.state.showNews ? <h2>News</h2> : ''}
           {this.state.showNews && this.state.showBloomberg ? <h4>Bloomberg</h4> : ''}
           {this.state.showNews && this.state.showBloomberg && bloombergArticles ? <Articles articles={bloombergArticles} /> : '' }
-          {this.state.showBusinessInsider ? <h4>Business Insider</h4> : ''}
+          {this.state.showNews && this.state.showBusinessInsider ? <h4>Business Insider</h4> : ''}
           {this.state.showNews && this.state.showBusinessInsider && businessInsiderArticles ? <Articles articles={businessInsiderArticles} /> : '' }
+          {this.state.showCNN ? <h4>CNN</h4> : ''}
+          {this.state.showNews && this.state.showCNN && cnnArticles ? <Articles articles={cnnArticles} /> : '' }
+          {this.state.showCNBC ? <h4>CNBC</h4> : ''}
+          {this.state.showNews && this.state.showCNBC && cnbcArticles ? <Articles articles={cnbcArticles} /> : '' }
         </div>
         <div style={{marginTop: "15px", marginBottom: "0px"}} className="row">
           <div>
-          {this.state.showAltCoins ?
-            <table style={{textAlign: "left"}} className="col-xs-6">
-              <tr>
-                <th>Symbol</th>
-                <th>Volume</th>
-                <th>Change</th>
-                <th>Price</th>
-              </tr>
-              <tbody>
-                {bittrex['1ST'] ? <Ccy ccy={bittrex['1ST']} /> : ''}
-                {bittrex['2GIVE'] ? <Ccy ccy={bittrex['2GIVE']} /> : ''}
-                {bittrex['ABY'] ? <Ccy ccy={bittrex['ABY']} /> : ''}
-                {bittrex['ADA'] ? <Ccy ccy={bittrex['ADA']} /> : ''}
-                {bittrex['ADT'] ? <Ccy ccy={bittrex['ADT']} /> : ''}
-                {bittrex['ADX'] ? <Ccy ccy={bittrex['ADX']} /> : ''}
-                {bittrex['AEON'] ? <Ccy ccy={bittrex['AEON']} /> : ''}
-                {bittrex['AGRS'] ? <Ccy ccy={bittrex['AGRS']} /> : ''}
-                {bittrex['AMP'] ? <Ccy ccy={bittrex['AMP']} /> : ''}
-                {bittrex['ANT'] ? <Ccy ccy={bittrex['ANT']} /> : ''}
-                {bittrex['APX'] ? <Ccy ccy={bittrex['APX']} /> : ''}
-                {bittrex['ARDR'] ? <Ccy ccy={bittrex['ARDR']} /> : ''}
-                {bittrex['ARK'] ? <Ccy ccy={bittrex['ARK']} /> : ''}
-                {bittrex['AUR'] ? <Ccy ccy={bittrex['AUR']} /> : ''}
-                {bittrex['BAT'] ? <Ccy ccy={bittrex['BAT']} /> : ''}
-                {bittrex['BAY'] ? <Ccy ccy={bittrex['BAY']} /> : ''}
-                {bittrex['BCC'] ? <Ccy ccy={bittrex['BCC']} /> : ''}
-                {bittrex['BCY'] ? <Ccy ccy={bittrex['BCY']} /> : ''}
-                {bittrex['BIT'] ? <Ccy ccy={bittrex['BIT']} /> : ''}
-                {bittrex['BLITZ'] ? <Ccy ccy={bittrex['BLITZ']} /> : ''}
-                {bittrex['BLK'] ? <Ccy ccy={bittrex['BLK']} /> : ''}
-                {bittrex['BLOCK'] ? <Ccy ccy={bittrex['BLOCK']} /> : ''}
-                {bittrex['BNT'] ? <Ccy ccy={bittrex['BNT']} /> : ''}
-                {bittrex['BRK'] ? <Ccy ccy={bittrex['BRK']} /> : ''}
-                {bittrex['BRX'] ? <Ccy ccy={bittrex['BRX']} /> : ''}
-                {bittrex['BSD'] ? <Ccy ccy={bittrex['BSD']} /> : ''}
-                {bittrex['BTCD'] ? <Ccy ccy={bittrex['BTCD']} /> : ''}
-                {bittrex['BTG'] ? <Ccy ccy={bittrex['BTG']} /> : ''}
-                {bittrex['BURST'] ? <Ccy ccy={bittrex['BURST']} /> : ''}
-                {bittrex['BYC'] ? <Ccy ccy={bittrex['BYC']} /> : ''}
-                {bittrex['CANN'] ? <Ccy ccy={bittrex['CANN']} /> : ''}
-                {bittrex['CFI'] ? <Ccy ccy={bittrex['CFI']} /> : ''}
-                {bittrex['CLAM'] ? <Ccy ccy={bittrex['CLAM']} /> : ''}
-                {bittrex['CLOAK'] ? <Ccy ccy={bittrex['CLOAK']} /> : ''}
-                {bittrex['CLUB'] ? <Ccy ccy={bittrex['CLUB']} /> : ''}
-                {bittrex['COVAL'] ? <Ccy ccy={bittrex['COVAL']} /> : ''}
-                {bittrex['CPC'] ? <Ccy ccy={bittrex['CPC']} /> : ''}
-                {bittrex['CRB'] ? <Ccy ccy={bittrex['CRB']} /> : ''}
-                {bittrex['CRW'] ? <Ccy ccy={bittrex['CRW']} /> : ''}
-                {bittrex['CURE'] ? <Ccy ccy={bittrex['CURE']} /> : ''}
-                {bittrex['CVC'] ? <Ccy ccy={bittrex['CVC']} /> : ''}
-                {bittrex['CURE'] ? <Ccy ccy={bittrex['CURE']} /> : ''}
-                {bittrex['DASH'] ? <Ccy ccy={bittrex['DASH']} /> : ''}
-                {bittrex['DCR'] ? <Ccy ccy={bittrex['DCR']} /> : ''}
-                {bittrex['DCT'] ? <Ccy ccy={bittrex['DCT']} /> : ''}
-                {bittrex['DGB'] ? <Ccy ccy={bittrex['DGB']} /> : ''}
-                {bittrex['DGD'] ? <Ccy ccy={bittrex['DGD']} /> : ''}
-                {bittrex['DMD'] ? <Ccy ccy={bittrex['DMD']} /> : ''}
-                {bittrex['DNT'] ? <Ccy ccy={bittrex['DNT']} /> : ''}
-                {bittrex['DOGE'] ? <Ccy ccy={bittrex['DOGE']} /> : ''}
-                {bittrex['DOPE'] ? <Ccy ccy={bittrex['DOPE']} /> : ''}
-                {bittrex['DTB'] ? <Ccy ccy={bittrex['DTB']} /> : ''}
-                {bittrex['DYN'] ? <Ccy ccy={bittrex['DYN']} /> : ''}
-                {bittrex['EBST'] ? <Ccy ccy={bittrex['EBST']} /> : ''}
-                {bittrex['EDG'] ? <Ccy ccy={bittrex['EDG']} /> : ''}
-                {bittrex['EFL'] ? <Ccy ccy={bittrex['EFL']} /> : ''}
-                {bittrex['EGC'] ? <Ccy ccy={bittrex['EGC']} /> : ''}
-                {bittrex['EMC'] ? <Ccy ccy={bittrex['EMC']} /> : ''}
-                {bittrex['EMC2'] ? <Ccy ccy={bittrex['EMC2']} /> : ''}
-                {bittrex['ENG'] ? <Ccy ccy={bittrex['ENG']} /> : ''}
-                {bittrex['ENRG'] ? <Ccy ccy={bittrex['ENRG']} /> : ''}
-                {bittrex['ERC'] ? <Ccy ccy={bittrex['ERC']} /> : ''}
-                {bittrex['ETC'] ? <Ccy ccy={bittrex['ETC']} /> : ''}
-                {bittrex['ETH'] ? <Ccy ccy={bittrex['ETH']} /> : ''}
-                {bittrex['EXCL'] ? <Ccy ccy={bittrex['EXCL']} /> : ''}
-                {bittrex['EXP'] ? <Ccy ccy={bittrex['EXP']} /> : ''}
-                {bittrex['FAIR'] ? <Ccy ccy={bittrex['FAIR']} /> : ''}
-                {bittrex['FCT'] ? <Ccy ccy={bittrex['FCT']} /> : ''}
-                {bittrex['FLDC'] ? <Ccy ccy={bittrex['FLDC']} /> : ''}
-                {bittrex['FLO'] ? <Ccy ccy={bittrex['FLO']} /> : ''}
-                {bittrex['FTC'] ? <Ccy ccy={bittrex['FTC']} /> : ''}
-                {bittrex['FUN'] ? <Ccy ccy={bittrex['FUN']} /> : ''}
-                {bittrex['GAM'] ? <Ccy ccy={bittrex['GAM']} /> : ''}
-                {bittrex['GAME'] ? <Ccy ccy={bittrex['GAME']} /> : ''}
-                {bittrex['GBG'] ? <Ccy ccy={bittrex['GBG']} /> : ''}
-                {bittrex['GBYTE'] ? <Ccy ccy={bittrex['GBYTE']} /> : ''}
-                {bittrex['GCR'] ? <Ccy ccy={bittrex['GCR']} /> : ''}
-                {bittrex['GEO'] ? <Ccy ccy={bittrex['GEO']} /> : ''}
-                {bittrex['GLD'] ? <Ccy ccy={bittrex['GLD']} /> : ''}
-                {bittrex['GNO'] ? <Ccy ccy={bittrex['GNO']} /> : ''}
-                {bittrex['GNT'] ? <Ccy ccy={bittrex['GNT']} /> : ''}
-                {bittrex['GOLO'] ? <Ccy ccy={bittrex['GOLO']} /> : ''}
-                {bittrex['GRC'] ? <Ccy ccy={bittrex['GRC']} /> : ''}
-                {bittrex['GRS'] ? <Ccy ccy={bittrex['GRS']} /> : ''}
-                {bittrex['GUP'] ? <Ccy ccy={bittrex['GUP']} /> : ''}
-                {bittrex['HMQ'] ? <Ccy ccy={bittrex['HMQ']} /> : ''}
-                {bittrex['INCNT'] ? <Ccy ccy={bittrex['INCNT']} /> : ''}
-                {bittrex['INFX'] ? <Ccy ccy={bittrex['INFX']} /> : ''}
-                {bittrex['IOC'] ? <Ccy ccy={bittrex['IOC']} /> : ''}
-                {bittrex['ION'] ? <Ccy ccy={bittrex['ION']} /> : ''}
-                {bittrex['IOP'] ? <Ccy ccy={bittrex['IOP']} /> : ''}
-                {bittrex['KMD'] ? <Ccy ccy={bittrex['KMD']} /> : ''}
-                {bittrex['KORE'] ? <Ccy ccy={bittrex['KORE']} /> : ''}
-                {bittrex['LBC'] ? <Ccy ccy={bittrex['LBC']} /> : ''}
-                {bittrex['LGD'] ? <Ccy ccy={bittrex['LGD']} /> : ''}
-                {bittrex['LMC'] ? <Ccy ccy={bittrex['LMC']} /> : ''}
-                {bittrex['LSK'] ? <Ccy ccy={bittrex['LSK']} /> : ''}
-                {bittrex['LTC'] ? <Ccy ccy={bittrex['LTC']} /> : ''}
-                {bittrex['LUN'] ? <Ccy ccy={bittrex['LUN']} /> : ''}
-                {bittrex['MAID'] ? <Ccy ccy={bittrex['MAID']} /> : ''}
-                {bittrex['MANA'] ? <Ccy ccy={bittrex['MANA']} /> : ''}
-                {bittrex['MCO'] ? <Ccy ccy={bittrex['MCO']} /> : ''}
-                {bittrex['MEME'] ? <Ccy ccy={bittrex['MEME']} /> : ''}
-                {bittrex['MER'] ? <Ccy ccy={bittrex['MER']} /> : ''}
-                {bittrex['MLN'] ? <Ccy ccy={bittrex['MLN']} /> : ''}
-                {bittrex['MONA'] ? <Ccy ccy={bittrex['MONA']} /> : ''}
-                {bittrex['MTL'] ? <Ccy ccy={bittrex['MTL']} /> : ''}
-                {bittrex['MUE'] ? <Ccy ccy={bittrex['MUE']} /> : ''}
-                {bittrex['MUSIC'] ? <Ccy ccy={bittrex['MUSIC']} /> : ''}
-                {bittrex['MYST'] ? <Ccy ccy={bittrex['MYST']} /> : ''}
-                {bittrex['NAV'] ? <Ccy ccy={bittrex['NAV']} /> : ''}
-                {bittrex['NBT'] ? <Ccy ccy={bittrex['NBT']} /> : ''}
-                {bittrex['NEO'] ? <Ccy ccy={bittrex['NEO']} /> : ''}
-                {bittrex['NEOS'] ? <Ccy ccy={bittrex['NEOS']} /> : ''}
-                {bittrex['NLG'] ? <Ccy ccy={bittrex['NLG']} /> : ''}
-                {bittrex['NMR'] ? <Ccy ccy={bittrex['NMR']} /> : ''}
-                {bittrex['NXC'] ? <Ccy ccy={bittrex['NXC']} /> : ''}
-                {bittrex['NXS'] ? <Ccy ccy={bittrex['NXS']} /> : ''}
-                {bittrex['NXT'] ? <Ccy ccy={bittrex['NXT']} /> : ''}
-                {bittrex['OK'] ? <Ccy ccy={bittrex['OK']} /> : ''}
-                {bittrex['OMG'] ? <Ccy ccy={bittrex['OMG']} /> : ''}
-                {bittrex['OMNI'] ? <Ccy ccy={bittrex['OMNI']} /> : ''}
-                {bittrex['PART'] ? <Ccy ccy={bittrex['PART']} /> : ''}
-                {bittrex['PAY'] ? <Ccy ccy={bittrex['PAY']} /> : ''}
-                {bittrex['PDC'] ? <Ccy ccy={bittrex['PDC']} /> : ''}
-                {bittrex['PINK'] ? <Ccy ccy={bittrex['PINK']} /> : ''}
-                {bittrex['PIVX'] ? <Ccy ccy={bittrex['PIVX']} /> : ''}
-                {bittrex['PKB'] ? <Ccy ccy={bittrex['PKB']} /> : ''}
-                {bittrex['POT'] ? <Ccy ccy={bittrex['POT']} /> : ''}
-                {bittrex['POWR'] ? <Ccy ccy={bittrex['POWR']} /> : ''}
-                {bittrex['PPC'] ? <Ccy ccy={bittrex['PPC']} /> : ''}
-                {bittrex['PTC'] ? <Ccy ccy={bittrex['PTC']} /> : ''}
-                {bittrex['PTOY'] ? <Ccy ccy={bittrex['PTOY']} /> : ''}
-                {bittrex['QRL'] ? <Ccy ccy={bittrex['QRL']} /> : ''}
-                {bittrex['QTUM'] ? <Ccy ccy={bittrex['QTUM']} /> : ''}
-                {bittrex['QWARK'] ? <Ccy ccy={bittrex['QWARK']} /> : ''}
-                {bittrex['RADS'] ? <Ccy ccy={bittrex['RADS']} /> : ''}
-                {bittrex['RBY'] ? <Ccy ccy={bittrex['RBY']} /> : ''}
-                {bittrex['RCN'] ? <Ccy ccy={bittrex['RCN']} /> : ''}
-                {bittrex['RDD'] ? <Ccy ccy={bittrex['RDD']} /> : ''}
-                {bittrex['REP'] ? <Ccy ccy={bittrex['REP']} /> : ''}
-                {bittrex['RISE'] ? <Ccy ccy={bittrex['RISE']} /> : ''}
-                {bittrex['RLCB'] ? <Ccy ccy={bittrex['RLCB']} /> : ''}
-                {bittrex['SALT'] ? <Ccy ccy={bittrex['SALT']} /> : ''}
-                {bittrex['SBD'] ? <Ccy ccy={bittrex['SBD']} /> : ''}
-                {bittrex['SC'] ? <Ccy ccy={bittrex['SC']} /> : ''}
-                {bittrex['SEQ'] ? <Ccy ccy={bittrex['SEQ']} /> : ''}
-                {bittrex['SHIFT'] ? <Ccy ccy={bittrex['SHIFT']} /> : ''}
-                {bittrex['SIB'] ? <Ccy ccy={bittrex['SIB']} /> : ''}
-                {bittrex['SLR'] ? <Ccy ccy={bittrex['SLR']} /> : ''}
-                {bittrex['SLS'] ? <Ccy ccy={bittrex['SLS']} /> : ''}
-                {bittrex['SNRG'] ? <Ccy ccy={bittrex['SNRG']} /> : ''}
-                {bittrex['SNT'] ? <Ccy ccy={bittrex['SNT']} /> : ''}
-                {bittrex['SPHR'] ? <Ccy ccy={bittrex['SPHR']} /> : ''}
-                {bittrex['SPR'] ? <Ccy ccy={bittrex['SPR']} /> : ''}
-                {bittrex['START'] ? <Ccy ccy={bittrex['START']} /> : ''}
-                {bittrex['STEEM'] ? <Ccy ccy={bittrex['STEEM']} /> : ''}
-                {bittrex['STORJ'] ? <Ccy ccy={bittrex['STORJ']} /> : ''}
-                {bittrex['STRAT'] ? <Ccy ccy={bittrex['STRAT']} /> : ''}
-                {bittrex['SWIFT'] ? <Ccy ccy={bittrex['SWIFT']} /> : ''}
-                {bittrex['SWT'] ? <Ccy ccy={bittrex['SWT']} /> : ''}
-                {bittrex['SYNX'] ? <Ccy ccy={bittrex['SYNX']} /> : ''}
-                {bittrex['SYS'] ? <Ccy ccy={bittrex['SYS']} /> : ''}
-                {bittrex['THC'] ? <Ccy ccy={bittrex['THC']} /> : ''}
-                {bittrex['TIX'] ? <Ccy ccy={bittrex['TIX']} /> : ''}
-                {bittrex['TKS'] ? <Ccy ccy={bittrex['TKS']} /> : ''}
-                {bittrex['TRIG'] ? <Ccy ccy={bittrex['TRIG']} /> : ''}
-                {bittrex['TRST'] ? <Ccy ccy={bittrex['TRST']} /> : ''}
-                {bittrex['TRUST'] ? <Ccy ccy={bittrex['TRUST']} /> : ''}
-                {bittrex['TX'] ? <Ccy ccy={bittrex['TX']} /> : ''}
-                {bittrex['UBQ'] ? <Ccy ccy={bittrex['UBQ']} /> : ''}
-                {bittrex['UKG'] ? <Ccy ccy={bittrex['UKG']} /> : ''}
-                {bittrex['UNB'] ? <Ccy ccy={bittrex['UNB']} /> : ''}
-                {bittrex['VIA'] ? <Ccy ccy={bittrex['VIA']} /> : ''}
-                {bittrex['VIB'] ? <Ccy ccy={bittrex['VIB']} /> : ''}
-                {bittrex['VOX'] ? <Ccy ccy={bittrex['VOX']} /> : ''}
-                {bittrex['VRC'] ? <Ccy ccy={bittrex['VRC']} /> : ''}
-                {bittrex['VRM'] ? <Ccy ccy={bittrex['VRM']} /> : ''}
-                {bittrex['VTC'] ? <Ccy ccy={bittrex['VTC']} /> : ''}
-                {bittrex['VTR'] ? <Ccy ccy={bittrex['VTR']} /> : ''}
-                {bittrex['WAVES'] ? <Ccy ccy={bittrex['WAVES']} /> : ''}
-                {bittrex['WINGS'] ? <Ccy ccy={bittrex['WINGS']} /> : ''}
-                {bittrex['XCP'] ? <Ccy ccy={bittrex['XCP']} /> : ''}
-                {bittrex['XDN'] ? <Ccy ccy={bittrex['XDN']} /> : ''}
-                {bittrex['XEL'] ? <Ccy ccy={bittrex['XEL']} /> : ''}
-                {bittrex['XEM'] ? <Ccy ccy={bittrex['XEM']} /> : ''}
-                {bittrex['XLM'] ? <Ccy ccy={bittrex['XLM']} /> : ''}
-                {bittrex['XMG'] ? <Ccy ccy={bittrex['XMG']} /> : ''}
-                {bittrex['XMR'] ? <Ccy ccy={bittrex['XMR']} /> : ''}
-                {bittrex['XMY'] ? <Ccy ccy={bittrex['XMY']} /> : ''}
-                {bittrex['XRP'] ? <Ccy ccy={bittrex['XRP']} /> : ''}
-                {bittrex['XST'] ? <Ccy ccy={bittrex['XST']} /> : ''}
-                {bittrex['XVC'] ? <Ccy ccy={bittrex['XVC']} /> : ''}
-                {bittrex['XVG'] ? <Ccy ccy={bittrex['XVG']} /> : ''}
-                {bittrex['XWC'] ? <Ccy ccy={bittrex['XWC']} /> : ''}
-                {bittrex['XZC'] ? <Ccy ccy={bittrex['XZC']} /> : ''}
-                {bittrex['ZCL'] ? <Ccy ccy={bittrex['ZCL']} /> : ''}
-                {bittrex['ZEC'] ? <Ccy ccy={bittrex['ZEC']} /> : ''}
-                {bittrex['ZEN'] ? <Ccy ccy={bittrex['ZEN']} /> : ''}
-              </tbody>
-            </table>
-          : ''}
+            {this.state.showAltCoins ? <TableContent content={bittrex} /> : ''}
+            {this.state.showFilteredAltCoins ? <TableContent content={bittrex} /> : ''}
           </div>
         </div>
       </div>

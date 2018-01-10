@@ -21,22 +21,22 @@ class App extends React.Component {
         <div>
           <NavLink exact to="/" activeStyle={choosenStyle}>Home</NavLink>
           {' | '}
-          <NavLink to="/about" activeStyle={choosenStyle}>About</NavLink>
+          <NavLink exact to="/about" activeStyle={choosenStyle}>About</NavLink>
           {' | '}
-          <NavLink to="/trading-view" activeStyle={choosenStyle}>Trading View</NavLink>
+          <NavLink exact to="/trading-view" activeStyle={choosenStyle}>Trading View</NavLink>
           {' | '}
-          <NavLink to="/learning" activeStyle={choosenStyle}>Learning</NavLink>
+          <NavLink exact to="/learning" activeStyle={choosenStyle}>Learning</NavLink>
           {' | '}
-          <NavLink to="/api" activeStyle={choosenStyle}>API</NavLink>
+          <NavLink exact to="/api" activeStyle={choosenStyle}>API</NavLink>
           {' | '}
-          <a href="https://trello.com/b/qMkwFOg9/tradingview" target="_blank" activeStyle={choosenStyle}>Trello</a>
+          <a href="https://trello.com/b/qMkwFOg9/tradingview" target="_blank">Trello</a>
         </div>
         <Switch>
           <Route exact path="/" component={HomePage} />
-          <Route path="/about" component={AboutPage} />
-          <Route path="/trading-view" component={TradingViewPage} />
-          <Route path="/learning" component={LearningPage} />
-          <Route path="/api" component={APIPage} />
+          <Route exact path="/about" component={AboutPage} />
+          <Route exact path="/trading-view" component={TradingViewPage} />
+          <Route exact path="/learning" component={LearningPage} />
+          <Route exact path="/api" component={APIPage} />
           <Route component={NotFoundPage} />
         </Switch>
       </div>

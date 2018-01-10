@@ -4,9 +4,10 @@ const Ccy = ({ccy}) => {
   if (!ccy) {
     ccy = {};
   }
-  if (!ccy.CHANGE24HOURPCT) {
-    ccy.CHANGE24HOURPCT = ' ';
-  }
+  if (!ccy.CHANGE24HOURPCT) { ccy.CHANGE24HOURPCT = ''; }
+  if (!ccy.FROMSYMBOL) { ccy.FROMSYMBOL = ''; }
+  if (!ccy.VOLUME24HOURTO) { ccy.VOLUME24HOURTO = ''; }
+  if (!ccy.PRICE) { ccy.PRICE = ''; }
   let currencyRow = {
     border: "1px white solid",
     backgroundColor: "#222"
