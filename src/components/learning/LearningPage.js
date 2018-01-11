@@ -4,6 +4,32 @@ export default class LearningPage extends React.Component {
   render() {
     return (
       <div>
+        <h1>Youtube</h1>
+
+        <p>
+          <b>Coin Mastery</b><img src="http://paradisetourspr.com/wp-content/uploads/2017/05/5-stars.png" height="40"></img>
+          <br/>
+          Silicon Valley based Carter Thomas gives his daily take on what is happening on the crypto markets (must watch!)
+          <br />
+          <a href="https://www.youtube.com/channel/UC4nXWTjZqK4bv7feoRntSog/videos" target="_blank"><i>https://www.youtube.com/channel/UC4nXWTjZqK4bv7feoRntSog/videos</i></a>
+        </p>
+    
+        <p>
+          <b>CryptoCandor</b><img src="http://paradisetourspr.com/wp-content/uploads/2017/05/5-stars.png" height="40"></img>
+          <br/>
+          Crypto enthusiast Alex breaks down and explains some of the major crypto assets such as Cardano, IOTA, PIVX, Lisk in a way which is easy to understand
+          <br />
+          <a href="https://www.youtube.com/channel/UCrNytueyuavn5mVVt89epDA/videos" target="_blank"><i>https://www.youtube.com/channel/UCrNytueyuavn5mVVt89epDA/videos</i></a>
+        </p>
+
+        <p>
+          <b>Ivan on Tech</b><img src="http://paradisetourspr.com/wp-content/uploads/2017/05/5-stars.png" height="40"></img>
+          <br/>
+          Swedish programmer Ivan Liljeqvist analyses and explains the underlying blockchain technology for each crypto asset from a programming perspective
+          <br />
+          <a href="https://www.youtube.com/user/LiljeqvistIvan/videos" target="_blank"><i>https://www.youtube.com/user/LiljeqvistIvan/videos</i></a>
+        </p>
+
         <h1>Technical Analysis</h1>
 
         <p>Crypto traders have several tools to assess the cryptocurrency market. One of them is an approach known as <b>Technical Analysis</b>.
